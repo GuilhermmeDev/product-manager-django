@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Sales</h1>
+
+<table class="w-full bg-white rounded shadow">
+    <thead class="bg-gray-200">
+        <tr>
+            <th class="p-3">ID</th>
+            <th class="p-3">User</th>
+            <th class="p-3">Total</th>
+            <th class="p-3">Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sale in sales %}
+        <tr class="border-t">
+            <td class="p-3">{{ sale.id }}</td>
+            <td class="p-3">{{ sale.user }}</td>
+            <td class="p-3">R$ {{ sale.total }}</td>
+            <td class="p-3">{{ sale.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

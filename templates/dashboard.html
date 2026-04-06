@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Dashboard</h1>
+
+<div class="grid grid-cols-3 gap-6">
+    <div class="bg-white p-6 rounded shadow">
+        <p class="text-gray-500">Total Products</p>
+        <p class="text-3xl font-bold">{{ total_products }}</p>
+    </div>
+
+    <div class="bg-white p-6 rounded shadow">
+        <p class="text-gray-500">Total Users</p>
+        <p class="text-3xl font-bold">{{ total_users }}</p>
+    </div>
+
+    <div class="bg-white p-6 rounded shadow">
+        <p class="text-gray-500">Revenue</p>
+        <p class="text-3xl font-bold">R$ {{ total_sales }}</p>
+    </div>
+</div>
+{% endblock %}

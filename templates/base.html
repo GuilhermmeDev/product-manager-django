@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>CRM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <nav class="bg-gray-900 text-white p-4">
+        <div class="container mx-auto flex justify-between">
+            <div class="font-bold">CRM</div>
+            <div class="space-x-4">
+                <a href="/" class="hover:text-gray-300">Dashboard</a>
+                <a href="/products/" class="hover:text-gray-300">Products</a>
+                <a href="/categories/" class="hover:text-gray-300">Categories</a>
+                <a href="/users/" class="hover:text-gray-300">Users</a>
+                <a href="/sales/" class="hover:text-gray-300">Sales</a>
+                <a href="/reports/revenue/" class="hover:text-gray-300">Revenue</a>
+                <a href="/reports/top-products/" class="hover:text-gray-300">Top Products</a>
+                <a href="/reports/low-stock/" class="hover:text-gray-300">Low Stock</a>
+                <form action="/logout/" method="post" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="hover:text-red-400">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto mt-6">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+</body>
+</html>

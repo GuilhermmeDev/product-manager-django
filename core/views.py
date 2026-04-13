@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from .models import Product, User, Sale, Category, SaleItem
-from .forms import CategoryForm, ProductForm, UserForm, RegisterForm
+from .forms import CategoryForm, ProductForm, RegisterForm
 from django.db.models import Sum
 from django.db import transaction
 from django.contrib.auth import login as auth_login

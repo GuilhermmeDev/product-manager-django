@@ -1,17 +1,44 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from .models import Product, User, Sale, Category, SaleItem
-from .forms import CategoryForm, ProductForm, UserForm
+from .forms import CategoryForm, ProductForm, UserForm, RegisterForm
 from django.db.models import Sum
 from django.db import transaction
+from django.contrib.auth import login as auth_login
+
+def landing(request):
+    if request.user.is_authenticated:
+        return redirect('/dashboard')
+
+    return render(request, 'landing.html')
+
+def register(request):
+    if request.user.is_authenticated:
+        return redirect('/dashboard/')
+    
+    form = RegisterForm(request.POST or None)
+
+    if form.is_valid():
+        user = form.save(commit=False)
+        user.role = 'customer'
+        user.set_password(form.cleaned_data['password'])
+        user.save()
+
+        auth_login(request, user)
+
+        return redirect('/dashboard/')
+
+    return render(request, 'register.html', {'form': form})
 
 @login_required
 def dashboard(request):
     total_products = Product.objects.count()
     total_users = User.objects.count()
     total_sales = Sale.objects.aggregate(total=Sum('total'))['total'] or 0
+    user = request.user
 
     context = {
+        'user': user,
         'total_products': total_products,
         'total_users': total_users,
         'total_sales': total_sales
@@ -50,16 +77,6 @@ def user_list(request):
 def sale_list(request):
     sales = Sale.objects.all()
     return render(request, 'sales/list.html', {'sales': sales})
-
-
-def user_create(request):
-    form = UserForm(request.POST or None)
-    if form.is_valid():
-        user = form.save(commit=False)
-        user.set_password('123456')
-        user.save()
-        return redirect('user_list')
-    return render(request, 'users/form.html', {'form': form})
 
 
 @transaction.atomic

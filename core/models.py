@@ -3,12 +3,13 @@ from django.db import models
 
 class User(AbstractUser):
     ROLE_CHOICES = (
-        ('owner', 'employee'),
-        ('Owner', 'Employee'),
+        ('owner', 'Owner'),
+        ('customer', 'Customer'),
     )
 
     role = models.CharField(max_length=50, choices=ROLE_CHOICES)
     phone = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField(unique=True)
 
 class Category(models.Model):
     name = models.CharField(max_length=100)

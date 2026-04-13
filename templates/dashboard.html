@@ -1,24 +1,53 @@
 {% extends 'base.html' %}
 
+{% block title %}Dashboard - CRM{% endblock %}
+
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">Dashboard</h1>
-<h2 class="text-xl mb-6">Olá, {{user.username}}! Sua permissão: {{user.role}}</h1>
+<div class="mb-10">
+    <h1 class="text-3xl font-semibold text-gray-900 mb-1">Dashboard</h1>
+    <p class="text-gray-600">Bem-vindo, {{ user.first_name|default:user.username }}</p>
+</div>
 
-
-<div class="grid grid-cols-3 gap-6">
-    <div class="bg-white p-6 rounded shadow">
-        <p class="text-gray-500">Total Products</p>
-        <p class="text-3xl font-bold">{{ total_products }}</p>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <!-- Total Products -->
+    <div class="border border-gray-200 rounded-lg p-6 bg-white hover:border-gray-300 transition">
+        <p class="text-sm text-gray-600 mb-2">Total de Produtos</p>
+        <p class="text-3xl font-semibold text-gray-900 mb-4">{{ total_products }}</p>
+        <a href="/products/" class="text-blue-600 text-sm hover:text-blue-700 font-medium">Ver detalhes →</a>
     </div>
 
-    <div class="bg-white p-6 rounded shadow">
-        <p class="text-gray-500">Total Users</p>
-        <p class="text-3xl font-bold">{{ total_users }}</p>
+    <!-- Total Users -->
+    <div class="border border-gray-200 rounded-lg p-6 bg-white hover:border-gray-300 transition">
+        <p class="text-sm text-gray-600 mb-2">Total de Usuários</p>
+        <p class="text-3xl font-semibold text-gray-900 mb-4">{{ total_users }}</p>
+        <a href="/users/" class="text-blue-600 text-sm hover:text-blue-700 font-medium">Ver detalhes →</a>
     </div>
 
-    <div class="bg-white p-6 rounded shadow">
-        <p class="text-gray-500">Revenue</p>
-        <p class="text-3xl font-bold">R$ {{ total_sales }}</p>
+    <!-- Total Revenue -->
+    <div class="border border-gray-200 rounded-lg p-6 bg-white hover:border-gray-300 transition">
+        <p class="text-sm text-gray-600 mb-2">Receita Total</p>
+        <p class="text-3xl font-semibold text-gray-900 mb-4">R$ {{ total_sales }}</p>
+        <a href="/sales/" class="text-blue-600 text-sm hover:text-blue-700 font-medium">Ver detalhes →</a>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="border border-gray-200 rounded-lg p-6 bg-white">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">Ações Rápidas</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <a href="/products/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+            Novo Produto
+        </a>
+        <a href="/categories/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+            Nova Categoria
+        </a>
+        <a href="/sales/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+            Nova Venda
+        </a>
+        <a href="/users/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+            Novo Usuário
+        </a>
     </div>
 </div>
 {% endblock %}

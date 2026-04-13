@@ -1,10 +1,27 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<h1 class="text-2xl font-bold mb-4">Revenue Report</h1>
+{% block title %}Receita - CRM{% endblock %}
 
-<div class="bg-white p-6 rounded shadow">
-    <p class="text-gray-500">Total Revenue</p>
-    <p class="text-3xl font-bold">R$ {{ revenue }}</p>
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-3xl font-semibold text-gray-900">Relatório de Receita</h1>
+    <p class="text-gray-600 text-sm mt-2">Visualize a receita total do seu negócio</p>
+</div>
+
+<!-- Main Stats Card -->
+<div class="mb-8 border border-gray-200 rounded-lg p-8 bg-gray-50">
+    <p class="text-gray-600 text-sm mb-2">Receita Total</p>
+    <h2 class="text-5xl font-bold text-gray-900">R$ {{ revenue }}</h2>
+    <p class="text-gray-500 text-sm mt-4">Baseado em todas as vendas registradas</p>
+</div>
+
+<!-- Navigation -->
+<div class="flex flex-col md:flex-row gap-4 justify-center">
+    <a href="/reports/top-products/" class="px-6 py-2 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 font-medium text-sm transition">
+        Ver Top Produtos
+    </a>
+    <a href="/reports/low-stock/" class="px-6 py-2 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 font-medium text-sm transition">
+        Ver Baixo Estoque
+    </a>
 </div>
 {% endblock %}

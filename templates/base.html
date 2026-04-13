@@ -3,37 +3,126 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>CRM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CRM - Sistema de Gestão{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
+    <style>
+        :root {
+            --color-primary: #2563eb;
+            --color-secondary: #1e40af;
+            --color-text: #1f2937;
+            --color-text-light: #6b7280;
+            --color-border: #e5e7eb;
+            --color-bg: #f9fafb;
+            --color-warning: #dc2626;
+        }
 
-    <nav class="bg-gray-900 text-white p-4">
-        <div class="container mx-auto flex justify-between">
-            <div class="font-bold">CRM</div>
-            <div class="space-x-4">
-                <a href="/" class="hover:text-gray-300">Dashboard</a>
-                <a href="/products/" class="hover:text-gray-300">Products</a>
-                <a href="/categories/" class="hover:text-gray-300">Categories</a>
-                <a href="/users/" class="hover:text-gray-300">Users</a>
-                <a href="/sales/" class="hover:text-gray-300">Sales</a>
-                <a href="/reports/revenue/" class="hover:text-gray-300">Revenue</a>
-                <a href="/reports/top-products/" class="hover:text-gray-300">Top Products</a>
-                <a href="/reports/low-stock/" class="hover:text-gray-300">Low Stock</a>
-                <form action="/logout/" method="post" class="inline">
-                    {% csrf_token %}
-                    <button type="submit" class="hover:text-red-400">
-                        Logout
+        body {
+            background-color: #ffffff;
+            color: var(--color-text);
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+    <!-- Navbar -->
+    <nav class="border-b border-gray-200 bg-white sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/" class="font-semibold text-lg text-gray-900">
+                    CRM System
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="/" class="text-sm text-gray-600 hover:text-gray-900 transition">Dashboard</a>
+
+                    <div class="relative group">
+                        <button class="text-sm text-gray-600 hover:text-gray-900 transition">Produtos</button>
+                        <div class="absolute left-0 mt-0 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
+                            <a href="/products/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Listar Produtos</a>
+                            <a href="/categories/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Categorias</a>
+                        </div>
+                    </div>
+
+                    <a href="/users/" class="text-sm text-gray-600 hover:text-gray-900 transition">Usuários</a>
+                    <a href="/sales/" class="text-sm text-gray-600 hover:text-gray-900 transition">Vendas</a>
+
+                    <div class="relative group">
+                        <button class="text-sm text-gray-600 hover:text-gray-900 transition">Relatórios</button>
+                        <div class="absolute left-0 mt-0 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
+                            <a href="/reports/revenue/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Receita</a>
+                            <a href="/reports/top-products/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Top Produtos</a>
+                            <a href="/reports/low-stock/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Baixo Estoque</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center gap-4">
+                    <div class="relative group">
+                        <button class="text-gray-600 hover:text-gray-900">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
+                            <a href="/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dashboard</a>
+                            <a href="/products/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Produtos</a>
+                            <a href="/categories/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Categorias</a>
+                            <a href="/users/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Usuários</a>
+                            <a href="/sales/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Vendas</a>
+                            <a href="/reports/revenue/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Receita</a>
+                            <a href="/reports/top-products/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Top Produtos</a>
+                            <a href="/reports/low-stock/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Baixo Estoque</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Dropdown -->
+                <div class="relative group hidden md:block">
+                    <button class="flex items-center gap-3 text-sm">
+                        <div class="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-semibold">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <span class="text-gray-700">{{ user.username }}</span>
                     </button>
-                </form>
+                    <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
+                        <div class="px-4 py-2 border-b border-gray-100">
+                            <p class="text-xs text-gray-500">Role</p>
+                            <p class="text-sm font-medium text-gray-900">{{ user.role }}</p>
+                        </div>
+                        <form action="/logout/" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container mx-auto mt-6">
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-6 p-4 rounded-lg border {% if message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% elif message.tags == 'success' %}bg-green-50 border-green-200 text-green-800{% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
         {% block content %}
         {% endblock %}
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 bg-white mt-16">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <p class="text-sm text-gray-600">© 2024 CRM System - Todos os direitos reservados</p>
+        </div>
+    </footer>
 
 </body>
 </html>

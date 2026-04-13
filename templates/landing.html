@@ -1,18 +1,157 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM - Sistema de Gestão</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white">
+<body class="bg-white">
 
-<div class="flex flex-col items-center justify-center h-screen text-center">
-    <h1 class="text-4xl font-bold mb-4">Bem-vindo ao CRM</h1>
-    <p class="text-gray-300 mb-6">Gerencie produtos, vendas e clientes</p>
+    <!-- Navigation -->
+    <nav class="border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="/" class="font-semibold text-lg text-gray-900">CRM System</a>
+            <div class="flex items-center gap-4">
+                <a href="/login/" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition">
+                    Entrar
+                </a>
+                <a href="/register/" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition">
+                    Registrar
+                </a>
+            </div>
+        </div>
+    </nav>
 
-    <a href="/login/" class="bg-blue-500 px-6 py-3 rounded">
-        Entrar
-    </a>
-</div>
+    <!-- Hero Section -->
+    <section class="max-w-7xl mx-auto px-6 py-20 text-center">
+        <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            Gerencie seu negócio com eficiência
+        </h1>
+        <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+            Uma plataforma simples e poderosa para gerenciar produtos, vendas, usuários e gerar relatórios em tempo real.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="/login/" class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition">
+                Entrar no Sistema
+            </a>
+            <a href="/register/" class="px-8 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 text-sm font-medium transition">
+                Criar Conta
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="max-w-7xl mx-auto px-6 py-20">
+        <h2 class="text-3xl font-bold text-gray-900 text-center mb-4">Funcionalidades</h2>
+        <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Tudo que você precisa para gerenciar seu negócio em um só lugar
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="border border-gray-200 rounded-lg p-8 hover:border-gray-300 transition">
+                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Gestão de Produtos</h3>
+                <p class="text-gray-600 text-sm">
+                    Cadastre e controle seu inventário com facilidade
+                </p>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="border border-gray-200 rounded-lg p-8 hover:border-gray-300 transition">
+                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Gestão de Vendas</h3>
+                <p class="text-gray-600 text-sm">
+                    Registre vendas e acompanhe sua receita em tempo real
+                </p>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="border border-gray-200 rounded-lg p-8 hover:border-gray-300 transition">
+                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM6 20h12a6 6 0 016-6H0a6 6 0 016 6z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Gestão de Usuários</h3>
+                <p class="text-gray-600 text-sm">
+                    Controle permissões e gerencie os usuários do sistema
+                </p>
+            </div>
+
+            <!-- Feature 4 -->
+            <div class="border border-gray-200 rounded-lg p-8 hover:border-gray-300 transition">
+                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Relatórios</h3>
+                <p class="text-gray-600 text-sm">
+                    Gere relatórios detalhados de receita e vendas
+                </p>
+            </div>
+
+            <!-- Feature 5 -->
+            <div class="border border-gray-200 rounded-lg p-8 hover:border-gray-300 transition">
+                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Categorias</h3>
+                <p class="text-gray-600 text-sm">
+                    Organize seus produtos por categorias
+                </p>
+            </div>
+
+            <!-- Feature 6 -->
+            <div class="border border-gray-200 rounded-lg p-8 hover:border-gray-300 transition">
+                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Rápido e Eficiente</h3>
+                <p class="text-gray-600 text-sm">
+                    Interface simples e intuitiva para máxima produtividade
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-gray-50 border-t border-gray-200">
+        <div class="max-w-4xl mx-auto px-6 py-16 text-center">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                Comece agora mesmo
+            </h2>
+            <p class="text-gray-600 mb-8 max-w-2xl mx-auto">
+                Crie sua conta e comece a gerenciar seu negócio com eficiência
+            </p>
+            <a href="/register/" class="inline-block px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition">
+                Criar Conta
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 bg-white">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <p class="text-center text-sm text-gray-600">
+                © 2024 CRM System - Todos os direitos reservados
+            </p>
+        </div>
+    </footer>
 
 </body>
 </html>

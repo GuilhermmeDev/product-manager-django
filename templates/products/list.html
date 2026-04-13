@@ -39,12 +39,12 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm">
-                            <button class="text-gray-400 hover:text-gray-600 transition mr-3">
+                            <a href="/products/{{ product.id }}/edit/" class="text-gray-400 hover:text-gray-600 transition mr-3">
                                 Editar
-                            </button>
-                            <button class="text-red-400 hover:text-red-600 transition">
+                            </a>
+                            <a href="/products/{{ product.id }}/delete/" class="text-red-400 hover:text-red-600 transition">
                                 Deletar
-                            </button>
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}

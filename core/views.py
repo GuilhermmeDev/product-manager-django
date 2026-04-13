@@ -58,6 +58,23 @@ def category_create(request):
         return redirect('category_list')
     return render(request, 'categories/form.html', {'form': form})
 
+
+def category_edit(request, pk):
+    category = Category.objects.get(id=pk)
+    form = CategoryForm(request.POST or None, instance=category)
+    if form.is_valid():
+        form.save()
+        return redirect('category_list')
+    return render(request, 'categories/form.html', {'form': form})
+
+
+def category_delete(request, pk):
+    category = Category.objects.get(id=pk)
+    if request.method == 'POST':
+        category.delete()
+        return redirect('category_list')
+    return render(request, 'categories/delete.html', {'object': category})
+
 def product_list(request):
     products = Product.objects.all()
     return render(request, 'products/list.html', {'products': products})
@@ -70,9 +87,34 @@ def product_create(request):
         return redirect('product_list')
     return render(request, 'products/form.html', {'form': form})
 
+
+def product_edit(request, pk):
+    product = Product.objects.get(id=pk)
+    form = ProductForm(request.POST or None, instance=product)
+    if form.is_valid():
+        form.save()
+        return redirect('product_list')
+    return render(request, 'products/form.html', {'form': form})
+
+
+def product_delete(request, pk):
+    product = Product.objects.get(id=pk)
+    if request.method == 'POST':
+        product.delete()
+        return redirect('product_list')
+    return render(request, 'products/delete.html', {'object': product})
+
 def user_list(request):
     users = User.objects.all()
     return render(request, 'users/list.html', {'users': users})
+
+
+def user_delete(request, pk):
+    user = User.objects.get(id=pk)
+    if request.method == 'POST':
+        user.delete()
+        return redirect('user_list')
+    return render(request, 'users/delete.html', {'object': user})
 
 def sale_list(request):
     sales = Sale.objects.all()

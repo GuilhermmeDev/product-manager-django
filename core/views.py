@@ -35,19 +35,38 @@ def register(request):
 
 @login_required
 def dashboard(request):
-    total_products = Product.objects.count()
-    total_users = User.objects.count()
-    total_sales = Sale.objects.aggregate(total=Sum('total'))['total'] or 0
     user = request.user
 
-    context = {
-        'user': user,
-        'total_products': total_products,
-        'total_users': total_users,
-        'total_sales': total_sales
-    }
+    # Dashboard para Owner
+    if user.role == 'owner':
+        total_products = Product.objects.count()
+        total_users = User.objects.count()
+        total_sales = Sale.objects.aggregate(total=Sum('total'))['total'] or 0
 
-    return render(request, 'dashboard.html', context)
+        context = {
+            'user': user,
+            'total_products': total_products,
+            'total_users': total_users,
+            'total_sales': total_sales
+        }
+        return render(request, 'dashboard.html', context)
+
+    # Dashboard para Customer
+    else:
+        total_products = Product.objects.count()
+        customer_sales = Sale.objects.filter(user=user)
+        total_spent = customer_sales.aggregate(total=Sum('total'))['total'] or 0
+        total_purchases = customer_sales.count()
+        recent_purchases = customer_sales.order_by('-created_at')[:5]
+
+        context = {
+            'user': user,
+            'total_products': total_products,
+            'total_spent': total_spent,
+            'total_purchases': total_purchases,
+            'recent_purchases': recent_purchases
+        }
+        return render(request, 'customer_dashboard.html', context)
 
 def category_list(request):
     categories = Category.objects.all()
@@ -79,7 +98,11 @@ def category_delete(request, pk):
     return render(request, 'categories/delete.html', {'object': category})
 
 def product_list(request):
-    products = Product.objects.all()
+    category = request.GET.get('category')
+    if category is not None:
+        products = Product.objects.filter(category__name=category)
+    else:
+        products = Product.objects.all()
     return render(request, 'products/list.html', {'products': products})
 
 @owner_required
@@ -120,9 +143,17 @@ def user_delete(request, pk):
         return redirect('user_list')
     return render(request, 'users/delete.html', {'object': user})
 
-@owner_required
+@login_required
 def sale_list(request):
-    sales = Sale.objects.all()
+    user = request.user
+
+    # Owners veem todas as vendas
+    if user.role == 'owner':
+        sales = Sale.objects.all()
+    # Customers veem apenas suas vendas
+    else:
+        sales = Sale.objects.filter(user=user)
+
     return render(request, 'sales/list.html', {'sales': sales})
 
 
@@ -169,7 +200,14 @@ def sale_create(request):
         return redirect('/sales/')
 
     products = Product.objects.all()
-    return render(request, 'sales/create.html', {'products': products})
+
+    # Pega o product_id da URL se foi passado
+    selected_product_id = request.GET.get('product')
+
+    return render(request, 'sales/create.html', {
+        'products': products,
+        'selected_product_id': selected_product_id
+    })
 
 @login_required
 def revenue_report(request):

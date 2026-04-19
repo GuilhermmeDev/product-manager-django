@@ -17,37 +17,34 @@
         <a href="/products/" class="text-blue-600 text-sm hover:text-blue-700 font-medium">Ver detalhes →</a>
     </div>
 
-    <!-- Total Users -->
-    <div class="border border-gray-200 rounded-lg p-6 bg-white hover:border-gray-300 transition">
-        <p class="text-sm text-gray-600 mb-2">Total de Usuários</p>
-        <p class="text-3xl font-semibold text-gray-900 mb-4">{{ total_users }}</p>
-        <a href="/users/" class="text-blue-600 text-sm hover:text-blue-700 font-medium">Ver detalhes →</a>
-    </div>
+    {% if request.user.role == "owner" %}
+        <!-- Total Users -->
+        <div class="border border-gray-200 rounded-lg p-6 bg-white hover:border-gray-300 transition">
+            <p class="text-sm text-gray-600 mb-2">Total de Usuários</p>
+            <p class="text-3xl font-semibold text-gray-900 mb-4">{{ total_users }}</p>
+            <a href="/users/" class="text-blue-600 text-sm hover:text-blue-700 font-medium">Ver detalhes →</a>
+        </div>
 
-    <!-- Total Revenue -->
-    <div class="border border-gray-200 rounded-lg p-6 bg-white hover:border-gray-300 transition">
-        <p class="text-sm text-gray-600 mb-2">Receita Total</p>
-        <p class="text-3xl font-semibold text-gray-900 mb-4">R$ {{ total_sales }}</p>
-        <a href="/sales/" class="text-blue-600 text-sm hover:text-blue-700 font-medium">Ver detalhes →</a>
+        <!-- Total Revenue -->
+        <div class="border border-gray-200 rounded-lg p-6 bg-white hover:border-gray-300 transition">
+            <p class="text-sm text-gray-600 mb-2">Receita Total</p>
+            <p class="text-3xl font-semibold text-gray-900 mb-4">R$ {{ total_sales }}</p>
+            <a href="/sales/" class="text-blue-600 text-sm hover:text-blue-700 font-medium">Ver detalhes →</a>
+        </div>
     </div>
-</div>
-
-<!-- Quick Actions -->
-<div class="border border-gray-200 rounded-lg p-6 bg-white">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4">Ações Rápidas</h2>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <a href="/products/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
-            Novo Produto
-        </a>
-        <a href="/categories/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
-            Nova Categoria
-        </a>
-        <a href="/sales/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
-            Nova Venda
-        </a>
-        <a href="/users/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
-            Novo Usuário
-        </a>
+    <div class="border border-gray-200 rounded-lg p-6 bg-white">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Ações Rápidas</h2>
+        <div class="grid grid-cols-3 gap-3">
+            <a href="/products/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+                Novo Produto
+            </a>
+            <a href="/categories/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+                Nova Categoria
+            </a>
+            <a href="/sales/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+                Nova Venda
+            </a>
+        </div>
     </div>
-</div>
+{% endif %}
 {% endblock %}

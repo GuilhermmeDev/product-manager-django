@@ -39,7 +39,7 @@
                     >
                         <option value="">Selecione um produto</option>
                         {% for product in products %}
-                        <option value="{{ product.id }}">
+                        <option value="{{ product.id }}" {% if selected_product_id == product.id|stringformat:"s" %}selected{% endif %}>
                             {{ product.name }} ({{ product.quantity }} em estoque)
                         </option>
                         {% endfor %}

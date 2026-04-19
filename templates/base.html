@@ -44,18 +44,20 @@
                         </div>
                     </div>
 
-                    <a href="/users/" class="text-sm text-gray-600 hover:text-gray-900 transition">Usuários</a>
-                    <a href="/sales/" class="text-sm text-gray-600 hover:text-gray-900 transition">Vendas</a>
+                    {% if request.user.role == 'owner'%}
+                        <a href="/users/" class="text-sm text-gray-600 hover:text-gray-900 transition">Usuários</a>
+                        <a href="/sales/" class="text-sm text-gray-600 hover:text-gray-900 transition">Vendas</a>
 
-                    <div class="relative group">
-                        <button class="text-sm text-gray-600 hover:text-gray-900 transition">Relatórios</button>
-                        <div class="absolute left-0 mt-0 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
-                            <a href="/reports/revenue/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Receita</a>
-                            <a href="/reports/top-products/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Top Produtos</a>
-                            <a href="/reports/low-stock/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Baixo Estoque</a>
+                        <div class="relative group">
+                            <button class="text-sm text-gray-600 hover:text-gray-900 transition">Relatórios</button>
+                            <div class="absolute left-0 mt-0 w-48 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2">
+                                    <a href="/reports/revenue/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Receita</a>
+                                    <a href="/reports/top-products/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Top Produtos</a>
+                                    <a href="/reports/low-stock/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Baixo Estoque</a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    {% endif %}
 
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden flex items-center gap-4">
@@ -69,11 +71,13 @@
                             <a href="/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Dashboard</a>
                             <a href="/products/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Produtos</a>
                             <a href="/categories/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Categorias</a>
-                            <a href="/users/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Usuários</a>
-                            <a href="/sales/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Vendas</a>
-                            <a href="/reports/revenue/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Receita</a>
+                            {% if request.user.role == 'owner'%}
+                                <a href="/users/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Usuários</a>
+                                <a href="/sales/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Vendas</a>
+                                <a href="/reports/revenue/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Receita</a>
+                                <a href="/reports/low-stock/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Baixo Estoque</a>
+                            {% endif %}
                             <a href="/reports/top-products/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Top Produtos</a>
-                            <a href="/reports/low-stock/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Baixo Estoque</a>
                         </div>
                     </div>
                 </div>

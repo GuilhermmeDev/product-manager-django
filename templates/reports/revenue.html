@@ -9,10 +9,17 @@
 </div>
 
 <!-- Main Stats Card -->
-<div class="mb-8 border border-gray-200 rounded-lg p-8 bg-gray-50">
-    <p class="text-gray-600 text-sm mb-2">Receita Total</p>
-    <h2 class="text-5xl font-bold text-gray-900">R$ {{ revenue }}</h2>
-    <p class="text-gray-500 text-sm mt-4">Baseado em todas as vendas registradas</p>
+<div class="mb-8 border border-gray-200 rounded-lg p-8 bg-gray-50 flex flex-row justify-between">
+    <div>
+        <p class="text-gray-600 text-sm mb-2">Receita Total</p>
+        <h2 class="text-5xl font-bold text-gray-900">R$ {{ revenue }}</h2>
+        <p class="text-gray-500 text-sm mt-4">Baseado em todas as vendas registradas</p>
+    </div>
+    <div>
+        <p class="text-red-600 text-sm mb-2">Receita nas Últimas 24 Horas 🔥</p>
+        <h2 class="text-5xl font-bold text-red-900">R$ {{ last_24 }}</h2>
+        <p class="text-red-500 text-sm mt-4">Baseado em todas as vendas registradas das últimas 24 horas</p>
+    </div>
 </div>
 
 <!-- Navigation -->

@@ -5,6 +5,9 @@ from .forms import CategoryForm, ProductForm, RegisterForm
 from django.db.models import Sum
 from django.db import transaction
 from django.contrib.auth import login as auth_login
+from .decorators import owner_required
+from datetime import timedelta
+from django.utils import timezone
 
 def landing(request):
     if request.user.is_authenticated:
@@ -50,7 +53,7 @@ def category_list(request):
     categories = Category.objects.all()
     return render(request, 'categories/list.html', {'categories': categories})
 
-
+@owner_required
 def category_create(request):
     form = CategoryForm(request.POST or None)
     if form.is_valid():
@@ -58,7 +61,7 @@ def category_create(request):
         return redirect('category_list')
     return render(request, 'categories/form.html', {'form': form})
 
-
+@owner_required
 def category_edit(request, pk):
     category = Category.objects.get(id=pk)
     form = CategoryForm(request.POST or None, instance=category)
@@ -67,7 +70,7 @@ def category_edit(request, pk):
         return redirect('category_list')
     return render(request, 'categories/form.html', {'form': form})
 
-
+@owner_required
 def category_delete(request, pk):
     category = Category.objects.get(id=pk)
     if request.method == 'POST':
@@ -79,7 +82,7 @@ def product_list(request):
     products = Product.objects.all()
     return render(request, 'products/list.html', {'products': products})
 
-
+@owner_required
 def product_create(request):
     form = ProductForm(request.POST or None)
     if form.is_valid():
@@ -87,7 +90,7 @@ def product_create(request):
         return redirect('product_list')
     return render(request, 'products/form.html', {'form': form})
 
-
+@owner_required
 def product_edit(request, pk):
     product = Product.objects.get(id=pk)
     form = ProductForm(request.POST or None, instance=product)
@@ -96,7 +99,7 @@ def product_edit(request, pk):
         return redirect('product_list')
     return render(request, 'products/form.html', {'form': form})
 
-
+@owner_required
 def product_delete(request, pk):
     product = Product.objects.get(id=pk)
     if request.method == 'POST':
@@ -104,11 +107,12 @@ def product_delete(request, pk):
         return redirect('product_list')
     return render(request, 'products/delete.html', {'object': product})
 
+@owner_required
 def user_list(request):
     users = User.objects.all()
     return render(request, 'users/list.html', {'users': users})
 
-
+@owner_required
 def user_delete(request, pk):
     user = User.objects.get(id=pk)
     if request.method == 'POST':
@@ -116,6 +120,7 @@ def user_delete(request, pk):
         return redirect('user_list')
     return render(request, 'users/delete.html', {'object': user})
 
+@owner_required
 def sale_list(request):
     sales = Sale.objects.all()
     return render(request, 'sales/list.html', {'sales': sales})
@@ -168,8 +173,10 @@ def sale_create(request):
 
 @login_required
 def revenue_report(request):
+    time_limit = timezone.now() - timedelta(hours=24)
     revenue = Sale.objects.aggregate(total=Sum('total'))['total']
-    return render(request, 'reports/revenue.html', {'revenue': revenue})
+    last_24 = Sale.objects.filter(created_at__gte=time_limit).aggregate(total_24=Sum('total'))['total_24'] or 0
+    return render(request, 'reports/revenue.html', {'revenue': revenue, 'last_24': last_24})
 
 @login_required
 def top_products(request):

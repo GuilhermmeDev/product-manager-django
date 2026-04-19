@@ -19,7 +19,12 @@
         <!-- Error Messages -->
         {% if form.errors %}
             <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p class="text-red-800 text-sm font-medium">Verifique os erros abaixo</p>
+                <p class="text-red-800 text-sm font-medium mb-3">Erros encontrados:</p>
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <p class="text-red-700 text-sm mb-1">• {{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
             </div>
         {% endif %}
 
@@ -36,9 +41,13 @@
                     type="text"
                     name="username"
                     placeholder="Escolha um nome de usuário"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    value="{{ form.username.value|default:'' }}"
+                    class="w-full px-4 py-2 border rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-1 transition {% if form.username.errors %}border-red-500 focus:border-red-500 focus:ring-red-500{% else %}border-gray-300 focus:border-blue-500 focus:ring-blue-500{% endif %}"
                     required
                 >
+                {% if form.username.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.username.errors.0 }}</p>
+                {% endif %}
             </div>
 
             <!-- Email -->
@@ -50,9 +59,13 @@
                     type="email"
                     name="email"
                     placeholder="seu@email.com"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    value="{{ form.email.value|default:'' }}"
+                    class="w-full px-4 py-2 border rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-1 transition {% if form.email.errors %}border-red-500 focus:border-red-500 focus:ring-red-500{% else %}border-gray-300 focus:border-blue-500 focus:ring-blue-500{% endif %}"
                     required
                 >
+                {% if form.email.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.email.errors.0 }}</p>
+                {% endif %}
             </div>
 
             <!-- First Name -->
@@ -64,9 +77,13 @@
                     type="text"
                     name="first_name"
                     placeholder="Seu primeiro nome"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    value="{{ form.first_name.value|default:'' }}"
+                    class="w-full px-4 py-2 border rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-1 transition {% if form.first_name.errors %}border-red-500 focus:border-red-500 focus:ring-red-500{% else %}border-gray-300 focus:border-blue-500 focus:ring-blue-500{% endif %}"
                     required
                 >
+                {% if form.first_name.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.first_name.errors.0 }}</p>
+                {% endif %}
             </div>
 
             <!-- Last Name -->
@@ -78,9 +95,13 @@
                     type="text"
                     name="last_name"
                     placeholder="Seu sobrenome"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    value="{{ form.last_name.value|default:'' }}"
+                    class="w-full px-4 py-2 border rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-1 transition {% if form.last_name.errors %}border-red-500 focus:border-red-500 focus:ring-red-500{% else %}border-gray-300 focus:border-blue-500 focus:ring-blue-500{% endif %}"
                     required
                 >
+                {% if form.last_name.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.last_name.errors.0 }}</p>
+                {% endif %}
             </div>
 
             <!-- Password -->
@@ -92,9 +113,12 @@
                     type="password"
                     name="password"
                     placeholder="Mínimo 8 caracteres"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    class="w-full px-4 py-2 border rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-1 transition {% if form.password.errors %}border-red-500 focus:border-red-500 focus:ring-red-500{% else %}border-gray-300 focus:border-blue-500 focus:ring-blue-500{% endif %}"
                     required
                 >
+                {% if form.password.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.password.errors.0 }}</p>
+                {% endif %}
             </div>
 
             <!-- Confirm Password -->
@@ -106,9 +130,12 @@
                     type="password"
                     name="confirm_password"
                     placeholder="Confirme sua senha"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    class="w-full px-4 py-2 border rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-1 transition {% if form.confirm_password.errors %}border-red-500 focus:border-red-500 focus:ring-red-500{% else %}border-gray-300 focus:border-blue-500 focus:ring-blue-500{% endif %}"
                     required
                 >
+                {% if form.confirm_password.errors %}
+                    <p class="text-red-600 text-xs mt-1">{{ form.confirm_password.errors.0 }}</p>
+                {% endif %}
             </div>
 
             <!-- Submit Button -->

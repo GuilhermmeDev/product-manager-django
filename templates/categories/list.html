@@ -1,52 +1,161 @@
 {% extends 'base.html' %}
+{% block title %}Categorias — FlowCRM{% endblock %}
 
-{% block title %}Categorias - CRM{% endblock %}
+{% block extra_head %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+    .page-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+    .page-header p { font-size: 0.875rem; color: var(--text-secondary); font-weight: 300; }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0.5rem 1.125rem;
+        background: var(--emerald);
+        border: 1px solid var(--emerald);
+        border-radius: 8px;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: #fff;
+        text-decoration: none;
+        transition: background 0.15s;
+        white-space: nowrap;
+        font-family: 'Sora', sans-serif;
+    }
+    .btn-primary:hover { background: var(--emerald-dim); border-color: var(--emerald-dim); }
+    .btn-primary svg { width: 13px; height: 13px; stroke: currentColor; }
+
+    .table-card {
+        background: var(--navy-2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { border-bottom: 1px solid var(--border); }
+    th {
+        padding: 0.625rem 1.25rem;
+        text-align: left;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        background: rgba(255,255,255,0.02);
+    }
+    tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background 0.15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    td { padding: 0.875rem 1.25rem; font-size: 0.875rem; color: var(--text-secondary); }
+
+    .badge-id {
+        display: inline-block;
+        padding: 2px 8px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+    .cat-link {
+        font-weight: 500;
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: color 0.15s;
+    }
+    .cat-link:hover { color: var(--emerald); }
+
+    .action-link {
+        font-size: 0.8125rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: color 0.15s;
+        padding: 3px 0;
+    }
+    .action-edit { color: var(--text-muted); margin-right: 1rem; }
+    .action-edit:hover { color: var(--text-secondary); }
+    .action-delete { color: rgba(248,113,113,0.5); }
+    .action-delete:hover { color: #f87171; }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 1rem;
+    }
+    .empty-icon {
+        width: 48px; height: 48px;
+        margin: 0 auto 1.25rem;
+        border-radius: 12px;
+        background: var(--emerald-glow);
+        border: 1px solid rgba(16,185,129,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .empty-icon svg { width: 20px; height: 20px; stroke: var(--emerald); }
+    .empty-state p { font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 0.25rem; }
+    .empty-state span { font-size: 0.8125rem; color: var(--text-muted); }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+
+<div class="page-header">
     <div>
-        <h1 class="text-3xl font-semibold text-gray-900">Categorias</h1>
-        <p class="text-gray-600 text-sm mt-1">{{ categories.count }} categorias cadastradas</p>
+        <h1>Categorias</h1>
+        <p>{{ categories.count }} categoria{{ categories.count|pluralize }} cadastrada{{ categories.count|pluralize }}</p>
     </div>
     {% if request.user.role == "owner" %}
-        <a href="/categories/new/" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm transition">
+        <a href="/categories/new/" class="btn-primary">
+            <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Nova Categoria
         </a>
     {% endif %}
 </div>
 
-<!-- Table -->
-<div class="border border-gray-200 rounded-lg overflow-hidden">
+<div class="table-card">
     {% if categories %}
-        <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-gray-50 border-b border-gray-200">
+        <div class="table-wrap">
+            <table>
+                <thead>
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900">ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900">Nome</th>
-                        {% if request.user.role == "owner" %}
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900">Ações</th>
-                        {% endif %}
+                        <th style="width:80px">ID</th>
+                        <th>Nome</th>
+                        {% if request.user.role == "owner" %}<th style="width:140px">Ações</th>{% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for category in categories %}
-                    <tr class="border-t border-gray-200 hover:bg-gray-50 transition">
-                        <td class="px-6 py-4 text-sm text-gray-600">{{ category.id }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-900 font-medium">
-                            <a href="/products?category={{ category.name }}" class="text-blue-600 hover:text-blue-800 transition">
+                    <tr>
+                        <td><span class="badge-id">{{ category.id }}</span></td>
+                        <td>
+                            <a href="/products?category={{ category.name }}" class="cat-link">
                                 {{ category.name }}
                             </a>
                         </td>
                         {% if request.user.role == "owner" %}
-                            <td class="px-6 py-4 text-sm">
-                                <a href="/categories/{{ category.id }}/edit/" class="text-gray-400 hover:text-gray-600 transition mr-3">
-                                    Editar
-                                </a>
-                                <a href="/categories/{{ category.id }}/delete/" class="text-red-400 hover:text-red-600 transition">
-                                    Deletar
-                                </a>
-                            </td>
+                        <td>
+                            <a href="/categories/{{ category.id }}/edit/" class="action-link action-edit">Editar</a>
+                            <a href="/categories/{{ category.id }}/delete/" class="action-link action-delete">Deletar</a>
+                        </td>
                         {% endif %}
                     </tr>
                     {% endfor %}
@@ -54,12 +163,18 @@
             </table>
         </div>
     {% else %}
-        <div class="p-12 text-center">
-            <p class="text-gray-600 font-medium">Nenhuma categoria cadastrada</p>
+        <div class="empty-state">
+            <div class="empty-icon">
+                <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+            </div>
+            <p>Nenhuma categoria cadastrada</p>
             {% if request.user.role == "owner" %}
-                <p class="text-gray-500 text-sm mt-1">Clique em "Nova Categoria" para adicionar uma</p>
+                <span>Clique em "Nova Categoria" para adicionar a primeira</span>
+            {% else %}
+                <span>Aguarde o administrador adicionar categorias</span>
             {% endif %}
         </div>
     {% endif %}
 </div>
+
 {% endblock %}

@@ -1,47 +1,45 @@
 {% extends 'base.html' %}
 
-{% block title %}Novo Produto - CRM{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar Produto{% else %}Novo Produto{% endif %} — FlowCRM{% endblock %}
 
 {% block content %}
-<div class="mb-8">
-    <h1 class="text-3xl font-semibold text-gray-900">Criar Novo Produto</h1>
-    <p class="text-gray-600 text-sm mt-2">Preencha os dados para adicionar um produto</p>
+<div class="page-header">
+    <div>
+        <h1>{% if form.instance.pk %}Editar Produto{% else %}Novo Produto{% endif %}</h1>
+        <p>{% if form.instance.pk %}Atualize as informações do produto abaixo{% else %}Preencha os dados para cadastrar um novo produto{% endif %}</p>
+    </div>
 </div>
 
-<!-- Form Container -->
-<div class="max-w-2xl border border-gray-200 rounded-lg p-6">
-    <form method="post" class="space-y-5">
+<div class="form-card">
+    <form method="post">
         {% csrf_token %}
 
-        <!-- Error Messages -->
         {% if form.non_field_errors %}
-            <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div class="alert-box error">
                 {% for error in form.non_field_errors %}
-                    <p class="text-red-800 text-sm">{{ error }}</p>
+                    <p>{{ error }}</p>
                 {% endfor %}
             </div>
         {% endif %}
 
-        <!-- Dynamic Form Fields -->
         {% for field in form %}
             {% if field.widget.input_type != 'hidden' %}
-                <div>
-                    <label class="block text-sm font-medium text-gray-900 mb-2">
+                <div class="form-group">
+                    <label class="form-label">
                         {{ field.label }}
-                        {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                        {% if field.field.required %}<span class="required">*</span>{% endif %}
                     </label>
 
                     {% if field.widget.input_type == 'textarea' %}
                         <textarea
                             name="{{ field.name }}"
-                            placeholder="{{ field.help_text }}"
-                            class="w-full px-4 py-2 border rounded-lg text-gray-900 focus:outline-none focus:ring-1 transition {% if field.errors %}border-red-500 focus:border-red-500 focus:ring-red-500{% else %}border-gray-300 focus:border-blue-500 focus:ring-blue-500{% endif %}"
+                            class="form-textarea {% if field.errors %}has-error{% endif %}"
                             {% if field.field.required %}required{% endif %}
                         >{{ field.value|default:'' }}</textarea>
                     {% elif field.widget.input_type == 'select' %}
                         <select
                             name="{{ field.name }}"
-                            class="w-full px-4 py-2 border rounded-lg text-gray-900 focus:outline-none focus:ring-1 transition {% if field.errors %}border-red-500 focus:border-red-500 focus:ring-red-500{% else %}border-gray-300 focus:border-blue-500 focus:ring-blue-500{% endif %}"
+                            class="select-input {% if field.errors %}has-error{% endif %}"
                             {% if field.field.required %}required{% endif %}
                         >
                             <option value="">Selecione...</option>
@@ -53,35 +51,27 @@
                         <input
                             type="{{ field.widget.input_type }}"
                             name="{{ field.name }}"
-                            placeholder="{{ field.help_text }}"
-                            class="w-full px-4 py-2 border rounded-lg text-gray-900 focus:outline-none focus:ring-1 transition {% if field.errors %}border-red-500 focus:border-red-500 focus:ring-red-500{% else %}border-gray-300 focus:border-blue-500 focus:ring-blue-500{% endif %}"
                             value="{{ field.value|default:'' }}"
+                            class="form-input {% if field.errors %}has-error{% endif %}"
                             {% if field.field.required %}required{% endif %}
                         >
                     {% endif %}
 
                     {% if field.help_text %}
-                        <p class="text-gray-500 text-xs mt-1">{{ field.help_text|safe }}</p>
+                        <p class="field-error" style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.35rem;">{{ field.help_text|safe }}</p>
                     {% endif %}
 
-                    {% if field.errors %}
-                        <div class="mt-2 p-2 bg-red-50 border border-red-200 rounded">
-                            {% for error in field.errors %}
-                                <p class="text-red-700 text-sm">• {{ error }}</p>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
+                    {% for error in field.errors %}
+                        <p class="field-error">{{ error }}</p>
+                    {% endfor %}
                 </div>
             {% endif %}
         {% endfor %}
 
-        <!-- Form Actions -->
-        <div class="flex gap-3 justify-end pt-4 border-t border-gray-200">
-            <a href="/products/" class="px-6 py-2 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 font-medium text-sm transition">
-                Cancelar
-            </a>
-            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm transition">
-                Salvar Produto
+        <div class="form-footer" style="justify-content: flex-end;">
+            <a href="/products/" class="btn-secondary">Cancelar</a>
+            <button type="submit" class="btn-primary">
+                {% if form.instance.pk %}Salvar alterações{% else %}Criar produto{% endif %}
             </button>
         </div>
     </form>

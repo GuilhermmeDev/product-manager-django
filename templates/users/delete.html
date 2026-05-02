@@ -1,28 +1,26 @@
 {% extends 'base.html' %}
 
-{% block title %}Deletar Usuário - CRM{% endblock %}
+{% block title %}Deletar Usuário — FlowCRM{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
-    <div class="mb-8">
-        <h1 class="text-3xl font-semibold text-gray-900">Confirmar exclusão</h1>
-        <p class="text-gray-600 text-sm mt-2">Tem certeza que deseja deletar este usuário?</p>
+<div class="page-header">
+    <div>
+        <h1>Confirmar exclusão</h1>
+        <p>Tem certeza que deseja deletar este usuário? Essa ação não pode ser desfeita.</p>
+    </div>
+</div>
+
+<div class="form-card">
+    <div class="form-group">
+        <label class="form-label">Usuário</label>
+        <div class="badge">{{ object.username }} ({{ object.email }})</div>
     </div>
 
-    <div class="border border-red-200 bg-red-50 rounded-lg p-6 mb-8">
-        <p class="text-red-800 font-medium mb-2">Usuário a ser deletado:</p>
-        <p class="text-red-700">{{ object.username }} ({{ object.email }})</p>
-    </div>
-
-    <div class="flex gap-3">
-        <a href="/users/" class="px-6 py-2 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 font-medium text-sm transition">
-            Cancelar
-        </a>
-        <form method="post" style="display: inline;">
+    <div class="form-footer" style="justify-content: flex-start; gap: 0.75rem; margin-top: 0;">
+        <a href="/users/" class="btn-secondary">Cancelar</a>
+        <form method="post" style="display:inline;">
             {% csrf_token %}
-            <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium text-sm transition">
-                Deletar
-            </button>
+            <button type="submit" class="btn-danger">Deletar usuário</button>
         </form>
     </div>
 </div>

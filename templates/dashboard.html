@@ -1,50 +1,201 @@
 {% extends 'base.html' %}
+{% block title %}Dashboard — FlowCRM{% endblock %}
 
-{% block title %}Dashboard - CRM{% endblock %}
+{% block extra_head %}
+<style>
+    .dash-header { margin-bottom: 2.5rem; }
+    .dash-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+    .dash-header p { font-size: 0.875rem; color: var(--text-secondary); font-weight: 300; }
+
+    /* Stat cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .stat-card {
+        background: var(--navy-2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.5rem;
+        transition: border-color 0.2s, background 0.2s;
+    }
+    .stat-card:hover { border-color: rgba(16,185,129,0.2); background: var(--navy-3); }
+    .stat-card-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--text-muted);
+        margin-bottom: 0.875rem;
+    }
+    .stat-card-value {
+        font-size: 2.25rem;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        color: var(--text-primary);
+        margin-bottom: 1.25rem;
+        line-height: 1;
+    }
+    .stat-card-link {
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--emerald);
+        text-decoration: none;
+        transition: color 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .stat-card-link:hover { color: #6ee7b7; }
+
+    /* Quick actions */
+    .section-card {
+        background: var(--navy-2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .section-card-title {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        letter-spacing: -0.01em;
+        margin-bottom: 1.25rem;
+    }
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+    }
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 0.75rem 1rem;
+        background: var(--navy-3);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: all 0.15s;
+    }
+    .action-btn:hover {
+        border-color: rgba(16,185,129,0.3);
+        color: var(--text-primary);
+        background: rgba(16,185,129,0.04);
+    }
+    .action-btn svg { width: 14px; height: 14px; stroke: currentColor; flex-shrink: 0; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { border-bottom: 1px solid var(--border); }
+    th {
+        padding: 0.625rem 1rem;
+        text-align: left;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+    }
+    tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background 0.15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    td { padding: 0.875rem 1rem; font-size: 0.875rem; color: var(--text-secondary); }
+    td.td-primary { color: var(--text-primary); font-weight: 500; }
+    td.td-mono { font-family: 'Sora', monospace; letter-spacing: -0.01em; }
+
+    .badge-id {
+        display: inline-block;
+        padding: 2px 8px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+    .empty-state p { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
+    .empty-state span { font-size: 0.8125rem; color: var(--text-muted); }
+
+    @media (max-width: 768px) {
+        .stats-grid { grid-template-columns: 1fr; }
+        .actions-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+        .actions-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="mb-10">
-    <h1 class="text-3xl font-semibold text-gray-900 mb-1">Dashboard</h1>
-    <p class="text-gray-600">Bem-vindo, {{ user.first_name|default:user.username }}</p>
+
+<div class="dash-header">
+    <h1>Dashboard</h1>
+    <p>Bem-vindo de volta, {{ user.first_name|default:user.username }}</p>
 </div>
 
-<!-- Stats Grid -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-    <!-- Total Products -->
-    <div class="border border-gray-200 rounded-lg p-6 bg-white hover:border-gray-300 transition">
-        <p class="text-sm text-gray-600 mb-2">Total de Produtos</p>
-        <p class="text-3xl font-semibold text-gray-900 mb-4">{{ total_products }}</p>
-        <a href="/products/" class="text-blue-600 text-sm hover:text-blue-700 font-medium">Ver detalhes →</a>
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-card-label">Total de Produtos</div>
+        <div class="stat-card-value">{{ total_products }}</div>
+        <a href="/products/" class="stat-card-link">Ver produtos →</a>
     </div>
 
     {% if request.user.role == "owner" %}
-        <!-- Total Users -->
-        <div class="border border-gray-200 rounded-lg p-6 bg-white hover:border-gray-300 transition">
-            <p class="text-sm text-gray-600 mb-2">Total de Usuários</p>
-            <p class="text-3xl font-semibold text-gray-900 mb-4">{{ total_users }}</p>
-            <a href="/users/" class="text-blue-600 text-sm hover:text-blue-700 font-medium">Ver detalhes →</a>
-        </div>
+    <div class="stat-card">
+        <div class="stat-card-label">Total de Usuários</div>
+        <div class="stat-card-value">{{ total_users }}</div>
+        <a href="/users/" class="stat-card-link">Ver usuários →</a>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-label">Receita Total</div>
+        <div class="stat-card-value" style="font-size:1.75rem">R$ {{ total_sales }}</div>
+        <a href="/sales/" class="stat-card-link">Ver vendas →</a>
+    </div>
+    {% endif %}
+</div>
 
-        <!-- Total Revenue -->
-        <div class="border border-gray-200 rounded-lg p-6 bg-white hover:border-gray-300 transition">
-            <p class="text-sm text-gray-600 mb-2">Receita Total</p>
-            <p class="text-3xl font-semibold text-gray-900 mb-4">R$ {{ total_sales }}</p>
-            <a href="/sales/" class="text-blue-600 text-sm hover:text-blue-700 font-medium">Ver detalhes →</a>
-        </div>
+{% if request.user.role == "owner" %}
+<!-- Quick Actions -->
+<div class="section-card">
+    <div class="section-card-title">Ações Rápidas</div>
+    <div class="actions-grid">
+        <a href="/products/new/" class="action-btn">
+            <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Novo Produto
+        </a>
+        <a href="/categories/new/" class="action-btn">
+            <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+            Nova Categoria
+        </a>
+        <a href="/sales/new/" class="action-btn">
+            <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            Nova Venda
+        </a>
     </div>
-    <div class="border border-gray-200 rounded-lg p-6 bg-white">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Ações Rápidas</h2>
-        <div class="grid grid-cols-3 gap-3">
-            <a href="/products/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
-                Novo Produto
-            </a>
-            <a href="/categories/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
-                Nova Categoria
-            </a>
-            <a href="/sales/new/" class="px-4 py-3 border border-gray-300 text-gray-900 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
-                Nova Venda
-            </a>
-        </div>
-    </div>
+</div>
 {% endif %}
+
 {% endblock %}

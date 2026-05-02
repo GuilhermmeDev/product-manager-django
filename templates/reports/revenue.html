@@ -5,26 +5,679 @@
 {% block content %}
 <div class="page-header">
     <div>
-        <h1>Relatório de Receita</h1>
-        <p>Visualize a visão geral da receita gerada pelo seu negócio.</p>
+        <h1>📊 Dashboard de Receita</h1>
+        <p>Monitore o desempenho financeiro do seu negócio em tempo real.</p>
     </div>
 </div>
 
-<div class="section-card" style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-    <div class="card" style="padding: 1.5rem;">
-        <p class="form-label">Receita Total</p>
-        <div class="td-primary" style="font-size: 2.5rem; margin: 0.75rem 0;">R$ {{ revenue }}</div>
-        <p style="color: var(--text-secondary);">Baseado em todas as vendas registradas.</p>
+<!-- Period Filters -->
+<div class="section-card" style="margin-bottom: 2rem;">
+    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <span style="font-weight: 500; color: var(--text-primary);">Período:</span>
+        <div class="period-filters" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="period-btn active" data-period="60min">Últimos 60 min</button>
+            <button class="period-btn" data-period="24h">Últimas 24h</button>
+            <button class="period-btn" data-period="7d">Últimos 7 dias</button>
+            <button class="period-btn" data-period="30d">Últimos 30 dias</button>
+            <button class="period-btn" data-period="custom">Personalizado</button>
+        </div>
     </div>
-    <div class="card" style="padding: 1.5rem;">
-        <p class="form-label">Últimas 24 horas</p>
-        <div class="td-primary" style="font-size: 2.5rem; margin: 0.75rem 0;">R$ {{ last_24 }}</div>
-        <p style="color: var(--text-secondary);">Receita registrada nas últimas 24 horas.</p>
+
+    <!-- Custom Date Range (hidden by default) -->
+    <div class="custom-date-range" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div>
+                <label class="form-label">Data Inicial</label>
+                <input type="date" class="form-input" id="startDate">
+            </div>
+            <div>
+                <label class="form-label">Data Final</label>
+                <input type="date" class="form-input" id="endDate">
+            </div>
+            <div style="display: flex; align-items: end;">
+                <button class="btn-primary" id="applyCustomDate">Aplicar</button>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="page-actions">
-    <a href="/reports/top-products/" class="btn-secondary">Ver Top Produtos</a>
-    <a href="/reports/low-stock/" class="btn-secondary">Ver Baixo Estoque</a>
+<!-- Key Metrics -->
+<div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Revenue Card -->
+    <div class="metric-card">
+        <div class="metric-header">
+            <div class="metric-icon">💰</div>
+            <div>
+                <h3 class="metric-title">Receita Total</h3>
+                <p class="metric-subtitle">No período selecionado</p>
+            </div>
+        </div>
+        <div class="metric-value" id="totalRevenue">{{ revenue }}</div>
+        <div class="metric-change" id="revenueChange">
+            <span class="change-indicator {% if revenue_change|slice:':1' == '+' %}positive{% else %}negative{% endif %}">
+                {% if revenue_change|slice:':1' == '+' %}↗{% else %}↘{% endif %} {{ revenue_change }}
+            </span>
+            <span class="change-text">vs período anterior</span>
+        </div>
+    </div>
+
+    <!-- Sales Count Card -->
+    <div class="metric-card">
+        <div class="metric-header">
+            <div class="metric-icon">🛒</div>
+            <div>
+                <h3 class="metric-title">Total de Vendas</h3>
+                <p class="metric-subtitle">Número de transações</p>
+            </div>
+        </div>
+        <div class="metric-value" id="totalSales">{{ sales_count }}</div>
+        <div class="metric-change" id="salesChange">
+            <span class="change-indicator {% if sales_change|slice:':1' == '+' %}positive{% else %}negative{% endif %}">
+                {% if sales_change|slice:':1' == '+' %}↗{% else %}↘{% endif %} {{ sales_change }}
+            </span>
+            <span class="change-text">vs período anterior</span>
+        </div>
+    </div>
+
+    <!-- Average Ticket Card -->
+    <div class="metric-card">
+        <div class="metric-header">
+            <div class="metric-icon">📊</div>
+            <div>
+                <h3 class="metric-title">Ticket Médio</h3>
+                <p class="metric-subtitle">Valor médio por venda</p>
+            </div>
+        </div>
+        <div class="metric-value" id="avgTicket">{{ avg_ticket }}</div>
+        <div class="metric-change" id="ticketChange">
+            <span class="change-indicator neutral">— Sem comparação</span>
+        </div>
+    </div>
+
+    <!-- Growth Rate Card -->
+    <div class="metric-card">
+        <div class="metric-header">
+            <div class="metric-icon">📈</div>
+            <div>
+                <h3 class="metric-title">Taxa de Crescimento</h3>
+                <p class="metric-subtitle">Comparado ao período anterior</p>
+            </div>
+        </div>
+        <div class="metric-value" id="growthRate">{{ revenue_change }}</div>
+        <div class="metric-change">
+            <span class="change-indicator {% if revenue_change|slice:':1' == '+' %}positive{% else %}negative{% endif %}">
+                {% if revenue_change|slice:':1' == '+' %}↗ Tendência positiva{% else %}↘ Tendência negativa{% endif %}
+            </span>
+        </div>
+    </div>
 </div>
+
+<!-- Charts Section -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Revenue Trend Chart -->
+    <div class="section-card">
+        <div style="padding: 1.5rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem;">Tendência de Receita</h3>
+            <div class="chart-container" style="height: 250px; position: relative;">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales by Hour Chart -->
+    <div class="section-card">
+        <div style="padding: 1.5rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem;">Vendas por Hora</h3>
+            <div class="chart-container" style="height: 250px; position: relative;">
+                <canvas id="hourlyChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Sales Table -->
+<div class="section-card">
+    <div style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary);">Vendas Recentes</h3>
+            <a href="/sales/" class="btn-link">Ver todas</a>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data/Hora</th>
+                        <th>Cliente</th>
+                        <th>Produtos</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="recentSalesTable">
+                    {% for sale in recent_sales %}
+                    <tr>
+                        <td>#{{ sale.id }}</td>
+                        <td>{{ sale.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>{{ sale.customer_name|default:"Cliente não informado" }}</td>
+                        <td>{{ sale.items_count }} item(s)</td>
+                        <td class="td-primary">R$ {{ sale.total }}</td>
+                        <td><span class="badge">Concluída</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 2rem;">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🛒</div>
+                                <p>Nenhuma venda encontrada</p>
+                                <span>no período selecionado</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="page-actions" style="margin-top: 2rem;">
+    <a href="/sales/new/" class="btn-primary">Nova Venda</a>
+    <a href="/reports/top-products/" class="btn-secondary">Top Produtos</a>
+    <a href="/reports/low-stock/" class="btn-secondary">Baixo Estoque</a>
+    {% comment %} <button class="btn-secondary" onclick="exportData()">Exportar Relatório</button> {% endcomment %}
+</div>
+
+<style>
+.period-filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.period-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.period-btn:hover {
+    border-color: var(--emerald);
+    color: var(--emerald);
+}
+
+.period-btn.active {
+    background: var(--emerald);
+    border-color: var(--emerald);
+    color: white;
+}
+
+.metric-card {
+    background: var(--navy-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--emerald), var(--emerald-dim));
+}
+
+.metric-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.metric-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.metric-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.metric-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0.25rem 0 0 0;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0.5rem 0;
+}
+
+.metric-change {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.change-indicator {
+    font-weight: 600;
+}
+
+.change-indicator.positive {
+    color: #10b981;
+}
+
+.change-indicator.negative {
+    color: #f87171;
+}
+
+.change-text {
+    color: var(--text-muted);
+}
+
+.chart-container {
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.custom-date-range {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .period-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .period-btn {
+        text-align: center;
+    }
+}
+</style>
+
+<script>
+// Helper function to get CSS variable values
+function getCSSVariable(variable) {
+    return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
+}
+
+// Helper function to get theme-aware colors for charts
+function getChartThemeColors() {
+    return {
+        tooltipBackground: getCSSVariable('--navy-2'),
+        tooltipTitle: getCSSVariable('--text-primary'),
+        tooltipBody: getCSSVariable('--text-secondary'),
+        tooltipBorder: getCSSVariable('--border'),
+        textSecondary: getCSSVariable('--text-secondary'),
+        border: getCSSVariable('--border'),
+        emerald: getCSSVariable('--emerald')
+    };
+}
+
+// Period filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const periodButtons = document.querySelectorAll('.period-btn');
+    const customDateRange = document.querySelector('.custom-date-range');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const applyCustomDateBtn = document.getElementById('applyCustomDate');
+
+    // Set default dates
+    const today = new Date();
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    startDateInput.value = sevenDaysAgo.toISOString().split('T')[0];
+    endDateInput.value = today.toISOString().split('T')[0];
+
+    periodButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            periodButtons.forEach(btn => btn.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+
+            const period = this.dataset.period;
+
+            if (period === 'custom') {
+                customDateRange.style.display = 'block';
+            } else {
+                customDateRange.style.display = 'none';
+                loadDataForPeriod(period);
+            }
+        });
+    });
+
+    applyCustomDateBtn.addEventListener('click', function() {
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+
+        if (startDate && endDate) {
+            loadDataForPeriod('custom', startDate, endDate);
+        }
+    });
+
+    // Set initial active button based on current period
+    const currentPeriod = '{{ period }}';
+    const activeButton = document.querySelector(`[data-period="${currentPeriod}"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+
+    // Set custom dates if they exist
+    {% if start_date %}
+    startDateInput.value = '{{ start_date }}';
+    {% endif %}
+    {% if end_date %}
+    endDateInput.value = '{{ end_date }}';
+    {% endif %}
+
+    // Initialize charts with initial data
+    initializeCharts();
+});
+
+function initializeCharts() {
+    // Wait for Chart.js to be loaded
+    if (typeof Chart === 'undefined') {
+        console.warn('Chart.js not loaded yet, retrying...');
+        setTimeout(initializeCharts, 100);
+        return;
+    }
+
+    const initialData = {
+        trend_data: {{ trend_data|safe }},
+        hourly_data: {{ hourly_data|safe }}
+    };
+    updateCharts(initialData);
+}
+
+function loadDataForPeriod(period, startDate = null, endDate = null) {
+    // Show loading state
+    showLoadingState();
+
+    // Build URL with parameters
+    let url = `/reports/revenue/?period=${period}`;
+    if (startDate && endDate) {
+        url += `&start_date=${startDate}&end_date=${endDate}`;
+    }
+
+    // Fetch new data
+    fetch(url, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        updateMetrics(data);
+        updateCharts(data);
+        updateRecentSales(data);
+        hideLoadingState();
+    })
+    .catch(error => {
+        console.error('Error loading data:', error);
+        hideLoadingState();
+    });
+}
+
+function updateMetrics(data) {
+    document.getElementById('totalRevenue').textContent = data.revenue;
+    document.getElementById('totalSales').textContent = data.sales_count;
+    document.getElementById('avgTicket').textContent = data.avg_ticket;
+    document.getElementById('growthRate').textContent = data.revenue_change;
+
+    // Update change indicators
+    updateChangeIndicator('revenueChange', data.revenue_change);
+    updateChangeIndicator('salesChange', data.sales_change);
+}
+
+function updateChangeIndicator(elementId, changeValue) {
+    const element = document.getElementById(elementId);
+    const indicator = element.querySelector('.change-indicator');
+    const isPositive = changeValue.startsWith('+');
+
+    indicator.className = `change-indicator ${isPositive ? 'positive' : 'negative'}`;
+    indicator.innerHTML = `${isPositive ? '↗' : '↘'} ${changeValue}`;
+}
+
+function updateCharts(data) {
+    const themeColors = getChartThemeColors();
+
+    // Revenue Trend Chart
+    const revenueCanvas = document.getElementById('revenueChart');
+    if (!revenueCanvas) {
+        console.error('Revenue chart canvas not found');
+        return;
+    }
+
+    // Destroy existing chart safely
+    if (window.revenueChart && typeof window.revenueChart.destroy === 'function') {
+        window.revenueChart.destroy();
+    }
+
+    if (data.trend_data && data.trend_data.length > 0) {
+        try {
+            window.revenueChart = new Chart(revenueCanvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: data.trend_data.map(item => item.date),
+                    datasets: [{
+                        label: 'Receita Diária',
+                        data: data.trend_data.map(item => item.revenue),
+                        borderColor: themeColors.emerald,
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: themeColors.emerald,
+                        pointBorderColor: themeColors.emerald,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'R$ ' + context.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                                }
+                            },
+                            backgroundColor: themeColors.tooltipBackground,
+                            titleColor: themeColors.tooltipTitle,
+                            bodyColor: themeColors.tooltipBody,
+                            borderColor: themeColors.tooltipBorder,
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 0});
+                                },
+                                color: themeColors.textSecondary
+                            },
+                            grid: {
+                                color: themeColors.border
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: themeColors.textSecondary
+                            },
+                            grid: {
+                                color: themeColors.border
+                            }
+                        }
+                    },
+                    elements: {
+                        point: {
+                            hoverBorderWidth: 3
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error creating revenue chart:', error);
+        }
+    }
+
+    // Hourly Sales Chart
+    const hourlyCanvas = document.getElementById('hourlyChart');
+    if (!hourlyCanvas) {
+        console.error('Hourly chart canvas not found');
+        return;
+    }
+
+    // Destroy existing chart safely
+    if (window.hourlyChart && typeof window.hourlyChart.destroy === 'function') {
+        window.hourlyChart.destroy();
+    }
+
+    if (data.hourly_data && data.hourly_data.length > 0) {
+        try {
+            window.hourlyChart = new Chart(hourlyCanvas.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: data.hourly_data.map(item => item.hour),
+                    datasets: [{
+                        label: 'Vendas por Hora',
+                        data: data.hourly_data.map(item => item.revenue),
+                        backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                        borderColor: themeColors.emerald,
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        hoverBackgroundColor: themeColors.emerald
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'R$ ' + context.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                                }
+                            },
+                            backgroundColor: themeColors.tooltipBackground,
+                            titleColor: themeColors.tooltipTitle,
+                            bodyColor: themeColors.tooltipBody,
+                            borderColor: themeColors.tooltipBorder,
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR', {minimumFractionDigits: 0});
+                                },
+                                color: themeColors.textSecondary
+                            },
+                            grid: {
+                                color: themeColors.border
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: themeColors.textSecondary,
+                                maxRotation: 45
+                            },
+                            grid: {
+                                color: themeColors.border
+                            }
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error creating hourly chart:', error);
+        }
+    }
+}
+
+function showLoadingState() {
+    const metrics = document.querySelectorAll('.metric-value');
+    metrics.forEach(metric => {
+        metric.style.opacity = '0.5';
+        metric.textContent = '...';
+    });
+}
+
+function hideLoadingState() {
+    const metrics = document.querySelectorAll('.metric-value');
+    metrics.forEach(metric => {
+        metric.style.opacity = '1';
+    });
+}
+
+// Theme change listener for charts
+const themeObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+            // Reinitialize charts with new theme colors
+            const currentData = {
+                trend_data: {{ trend_data|safe }},
+                hourly_data: {{ hourly_data|safe }}
+            };
+            updateCharts(currentData);
+        }
+    });
+});
+
+themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme']
+});
+
+</script>
 {% endblock %}

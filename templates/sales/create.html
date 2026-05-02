@@ -10,6 +10,12 @@
     </div>
 </div>
 
+{% if error_message %}
+<div class="alert-box error" style="margin-bottom: 2rem;">
+    <p>{{ error_message }}</p>
+</div>
+{% endif %}
+
 <div class="form-card">
     <form method="post">
         {% csrf_token %}

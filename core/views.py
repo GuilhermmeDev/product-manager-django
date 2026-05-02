@@ -1,4 +1,5 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import Product, User, Sale, Category, SaleItem
 from .forms import CategoryForm, ProductForm, RegisterForm
@@ -159,6 +160,12 @@ def sale_list(request):
 
 @transaction.atomic
 def create_sale(user, items):
+    # First, validate stock availability
+    for item in items:
+        product = Product.objects.get(id=item['product_id'])
+        if product.quantity < item['quantity']:
+            raise ValueError(f'Estoque insuficiente para o produto "{product.name}". Disponível: {product.quantity}, solicitado: {item["quantity"]}')
+
     sale = Sale.objects.create(user=user, total=0)
     total = 0
 
@@ -196,8 +203,18 @@ def sale_create(request):
                 'quantity': int(quantities[i])
             })
 
-        create_sale(request.user, items)
-        return redirect('/sales/')
+        try:
+            create_sale(request.user, items)
+            return redirect('/sales/')
+        except ValueError as e:
+            # Add error message to context
+            products = Product.objects.all()
+            selected_product_id = request.GET.get('product')
+            return render(request, 'sales/create.html', {
+                'products': products,
+                'selected_product_id': selected_product_id,
+                'error_message': str(e)
+            })
 
     products = Product.objects.all()
 
@@ -211,10 +228,123 @@ def sale_create(request):
 
 @login_required
 def revenue_report(request):
-    time_limit = timezone.now() - timedelta(hours=24)
-    revenue = Sale.objects.aggregate(total=Sum('total'))['total']
-    last_24 = Sale.objects.filter(created_at__gte=time_limit).aggregate(total_24=Sum('total'))['total_24'] or 0
-    return render(request, 'reports/revenue.html', {'revenue': revenue, 'last_24': last_24})
+    # Get period from query parameters
+    period = request.GET.get('period', '7d')  # default to 7 days
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    now = timezone.now()
+
+    # Define time ranges based on period
+    if period == '60min':
+        time_limit = now - timedelta(minutes=60)
+        prev_time_limit = time_limit - timedelta(minutes=60)
+    elif period == '24h':
+        time_limit = now - timedelta(hours=24)
+        prev_time_limit = time_limit - timedelta(hours=24)
+    elif period == '7d':
+        time_limit = now - timedelta(days=7)
+        prev_time_limit = time_limit - timedelta(days=7)
+    elif period == '30d':
+        time_limit = now - timedelta(days=30)
+        prev_time_limit = time_limit - timedelta(days=30)
+    elif period == 'custom' and start_date and end_date:
+        try:
+            start_dt = timezone.datetime.fromisoformat(start_date)
+            end_dt = timezone.datetime.fromisoformat(end_date) + timedelta(days=1)  # include end date
+            time_limit = timezone.make_aware(start_dt)
+            prev_time_limit = time_limit - (end_dt - start_dt)  # same duration before
+        except ValueError:
+            # Fallback to 7 days if dates are invalid
+            time_limit = now - timedelta(days=7)
+            prev_time_limit = time_limit - timedelta(days=7)
+    else:
+        # Default to 7 days
+        time_limit = now - timedelta(days=7)
+        prev_time_limit = time_limit - timedelta(days=7)
+
+    # Current period sales
+    current_sales = Sale.objects.filter(created_at__gte=time_limit)
+    prev_sales = Sale.objects.filter(created_at__gte=prev_time_limit, created_at__lt=time_limit)
+
+    # Calculate metrics for current period
+    revenue = current_sales.aggregate(total=Sum('total'))['total'] or 0
+    sales_count = current_sales.count()
+    avg_ticket = revenue / sales_count if sales_count > 0 else 0
+
+    # Calculate metrics for previous period
+    prev_revenue = prev_sales.aggregate(total=Sum('total'))['total'] or 0
+    prev_sales_count = prev_sales.count()
+
+    # Calculate growth rates
+    revenue_change = ((revenue - prev_revenue) / prev_revenue * 100) if prev_revenue > 0 else 0
+    sales_change = ((sales_count - prev_sales_count) / prev_sales_count * 100) if prev_sales_count > 0 else 0
+
+    # Recent sales for the table (last 10 sales in the period)
+    recent_sales = current_sales.select_related('user').order_by('-created_at')[:10]
+
+    # Add items_count to each sale for the template
+    for sale in recent_sales:
+        sale.items_count = SaleItem.objects.filter(sale=sale).aggregate(count=Sum('quantity'))['count'] or 0
+
+    # Chart data - sales by hour for the last 24 hours (for hourly chart)
+    hourly_data = []
+    for i in range(24):
+        hour_start = now - timedelta(hours=i+1)
+        hour_end = now - timedelta(hours=i)
+        hour_sales = Sale.objects.filter(
+            created_at__gte=hour_start,
+            created_at__lt=hour_end
+        ).aggregate(total=Sum('total'))['total'] or 0
+        hourly_data.append({
+            'hour': (now - timedelta(hours=i)).strftime('%H:00'),
+            'revenue': float(hour_sales)
+        })
+    hourly_data.reverse()  # chronological order
+
+    # Revenue trend data (daily for the period)
+    trend_data = []
+    days_in_period = (now - time_limit).days + 1
+    for i in range(days_in_period):
+        day_start = time_limit + timedelta(days=i)
+        day_end = time_limit + timedelta(days=i+1)
+        day_sales = Sale.objects.filter(
+            created_at__gte=day_start,
+            created_at__lt=day_end
+        ).aggregate(total=Sum('total'))['total'] or 0
+        trend_data.append({
+            'date': day_start.strftime('%d/%m'),
+            'revenue': float(day_sales)
+        })
+
+    # Check if this is an AJAX request
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({
+            'revenue': f"R$ {revenue:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
+            'sales_count': sales_count,
+            'avg_ticket': f"R$ {avg_ticket:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
+            'revenue_change': f"{revenue_change:+.1f}%",
+            'sales_change': f"{sales_change:+.1f}%",
+            'trend_data': trend_data,
+            'hourly_data': hourly_data,
+            'recent_sales_count': recent_sales.count(),
+        })
+
+    context = {
+        'period': period,
+        'revenue': f"R$ {revenue:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
+        'sales_count': sales_count,
+        'avg_ticket': f"R$ {avg_ticket:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.'),
+        'revenue_change': f"{revenue_change:+.1f}%",
+        'sales_change': f"{sales_change:+.1f}%",
+        'recent_sales': recent_sales,
+        'hourly_data': hourly_data,
+        'trend_data': trend_data,
+        'start_date': start_date,
+        'end_date': end_date,
+    }
+
+    return render(request, 'reports/revenue.html', context)
 
 @login_required
 def top_products(request):
